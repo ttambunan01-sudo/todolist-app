@@ -1,70 +1,274 @@
-# Getting Started with Create React App
+# TodoList Frontend Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![CI Status](https://github.com/ttambunan01-sudo/todolist-app/actions/workflows/frontend-ci.yml/badge.svg)
+
+A modern, responsive React application for managing todo items with full CRUD operations.
+
+## Features
+
+- ✅ Create, read, update, and delete todos
+- ✅ Toggle todo completion status
+- ✅ Inline editing of todo titles
+- ✅ Real-time todo statistics
+- ✅ Responsive UI design
+- ✅ Error handling with user feedback
+- ✅ Loading states for better UX
+- ✅ Comprehensive test coverage (86%+)
+- ✅ CI/CD with GitHub Actions
+- ✅ Docker containerization
+
+## Technology Stack
+
+- **Framework:** React 19
+- **Build Tool:** Create React App
+- **Testing:** Jest + React Testing Library
+- **Styling:** CSS3
+- **API Client:** Fetch API
+- **Containerization:** Docker + Nginx
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 20+
+- npm
+- Backend API running (see [backend repository](https://github.com/ttambunan01-sudo/todolist))
+
+### Local Development
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/ttambunan01-sudo/todolist-app.git
+   cd todolist-app
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+
+   Create a `.env` file:
+   ```
+   REACT_APP_API_BASE_URL=http://localhost:8080/api/v1
+   ```
+
+4. **Run the application**
+   ```bash
+   npm start
+   ```
+
+5. **Access the app**
+   - Open [http://localhost:3000](http://localhost:3000)
+
+### Using Docker
+
+```bash
+# Build the image
+docker build -t todolist-frontend:latest .
+
+# Run the container
+docker run -p 3000:80 todolist-frontend:latest
+```
+
+## Testing
+
+```bash
+# Run tests in watch mode
+npm test
+
+# Run tests once with coverage
+npm test -- --watchAll=false --coverage
+
+# View coverage report
+open coverage/lcov-report/index.html
+```
+
+## Test Coverage
+
+Current coverage: **~86% for components**
+
+- App.js: 100%
+- TodoList.js: 86.3%
+- 15 test cases covering:
+  - Component rendering
+  - CRUD operations
+  - Error handling
+  - User interactions
+  - State management
+
+## Project Structure
+
+```
+src/
+├── components/
+│   ├── TodoList.js           # Main todo list component
+│   ├── TodoList.css          # Component styles
+│   └── TodoList.test.js      # Component tests
+├── services/
+│   └── api.js                # API client
+├── App.js                    # Root component
+├── App.test.js               # App tests
+├── App.css                   # App styles
+└── index.js                  # Entry point
+```
+
+## API Integration
+
+The frontend communicates with the backend REST API:
+
+| Method | Endpoint | Action |
+|--------|----------|--------|
+| GET | `/api/v1/todos` | Fetch all todos |
+| POST | `/api/v1/todos` | Create new todo |
+| PUT | `/api/v1/todos/:id` | Update todo |
+| DELETE | `/api/v1/todos/:id` | Delete todo |
 
 ## Available Scripts
 
-In the project directory, you can run:
-
 ### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Runs the app in development mode at [http://localhost:3000](http://localhost:3000).
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+The page reloads on changes. Lint errors appear in the console.
 
 ### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Launches the test runner in interactive watch mode.
 
 ### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Builds the app for production to the `build` folder.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Bundles React in production mode and optimizes for best performance.
 
 ### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+**Note: This is a one-way operation!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Copies all configuration files into your project for full control.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## CI/CD Pipeline
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+This project uses GitHub Actions for continuous integration and deployment:
 
-## Learn More
+- **On Push/PR:** Runs tests with coverage
+- **On Main Branch:** Builds and pushes Docker image to Docker Hub
+- **Test Reports:** Automatically uploaded as artifacts
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+See [CI/CD Documentation](docs/CI.md) for more details.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Docker Image
 
-### Code Splitting
+Pull the latest image:
+```bash
+docker pull ttambunan01/todolist-frontend:latest
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Run with environment variables:
+```bash
+docker run -p 3000:80 \
+  -e REACT_APP_API_BASE_URL=http://your-backend-api:8080/api/v1 \
+  ttambunan01/todolist-frontend:latest
+```
 
-### Analyzing the Bundle Size
+## Environment Variables
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `REACT_APP_API_BASE_URL` | Backend API base URL | `http://localhost:8080/api/v1` |
 
-### Making a Progressive Web App
+**Note:** Environment variables must be prefixed with `REACT_APP_` to be embedded in the build.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Deployment
 
-### Advanced Configuration
+### Production Build
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```bash
+npm run build
+```
 
-### Deployment
+The `build` folder contains the optimized production build.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### Deploy to Nginx
 
-### `npm run build` fails to minify
+```bash
+# Copy build files to nginx
+cp -r build/* /var/www/html/
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+# Configure nginx reverse proxy for API
+# See nginx.conf for example configuration
+```
+
+### Deploy with Docker
+
+```bash
+docker build -t todolist-frontend:v1.0.0 .
+docker push your-registry/todolist-frontend:v1.0.0
+```
+
+## Browser Support
+
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/new-feature`
+3. Make your changes
+4. Run tests: `npm test -- --watchAll=false`
+5. Commit: `git commit -m "feat: add new feature"`
+6. Push: `git push origin feature/new-feature`
+7. Submit a pull request
+
+## Troubleshooting
+
+### API Connection Failed
+
+**Problem:** "Failed to load todos. Make sure the backend server is running."
+
+**Solution:**
+1. Verify backend is running at the configured URL
+2. Check CORS settings in backend
+3. Verify `REACT_APP_API_BASE_URL` is correct
+
+### Tests Failing
+
+**Problem:** Tests fail locally
+
+**Solution:**
+```bash
+# Clear cache and reinstall
+rm -rf node_modules package-lock.json
+npm install
+npm test
+```
+
+### Build Errors
+
+**Problem:** `npm run build` fails
+
+**Solution:**
+```bash
+# Clear cache
+rm -rf node_modules build
+npm install
+npm run build
+```
+
+## License
+
+[Add your license here]
+
+## Authors
+
+[Add your name/team here]
+
+---
+
+**Last Updated:** 2025-11-28
+**Version:** 0.1.0

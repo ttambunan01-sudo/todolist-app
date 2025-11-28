@@ -1,8 +1,21 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+// Mock the TodoList component to avoid API calls in App test
+jest.mock('./components/TodoList', () => {
+  return function MockTodoList() {
+    return <div data-testid="todo-list-mock">TodoList Component</div>;
+  };
+});
+
+test('renders App component', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const appElement = screen.getByTestId('todo-list-mock');
+  expect(appElement).toBeInTheDocument();
+});
+
+test('App has correct class name', () => {
+  const { container } = render(<App />);
+  const appDiv = container.querySelector('.App');
+  expect(appDiv).toBeInTheDocument();
 });
