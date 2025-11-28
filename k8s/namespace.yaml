@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: todolist-dev
-  labels:
-    name: todolist-dev
-    environment: development
