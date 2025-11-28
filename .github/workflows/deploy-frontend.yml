@@ -1,0 +1,99 @@
+name: Deploy Frontend to Kubernetes
+
+on:
+  workflow_run:
+    workflows: ["Frontend CI"]
+    types:
+      - completed
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+
+      - name: Configure kubectl
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+          kubectl cluster-info
+
+      - name: Ensure namespace exists
+        run: |
+          kubectl create namespace todolist-dev --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Check Backend Availability
+        run: |
+          if ! kubectl get svc backend-service -n todolist-dev &> /dev/null; then
+            echo "WARNING: Backend service not found. Please deploy backend first."
+          else
+            echo "Backend service found"
+          fi
+
+      - name: Deploy Frontend Configuration
+        run: |
+          kubectl apply -f k8s/frontend/configmap.yaml
+          kubectl apply -f k8s/frontend/service.yaml
+
+      - name: Deploy Frontend Application
+        run: |
+          COMMIT_SHA="${{ github.event.workflow_run.head_sha }}"
+          SHORT_SHA="${COMMIT_SHA:0:7}"
+
+          echo "Deploying frontend with image: ttambunan01/todolist-frontend:git-${SHORT_SHA}"
+
+          kubectl apply -f k8s/frontend/deployment.yaml
+
+          kubectl set image deployment/frontend \
+            frontend=ttambunan01/todolist-frontend:git-${SHORT_SHA} \
+            -n todolist-dev
+
+          kubectl rollout status deployment/frontend -n todolist-dev --timeout=300s
+
+      - name: Health Check
+        run: |
+          kubectl wait --for=condition=ready pod -l app=frontend -n todolist-dev --timeout=120s
+
+          FRONTEND_POD=$(kubectl get pod -l app=frontend -n todolist-dev -o jsonpath="{.items[0].metadata.name}")
+
+          kubectl exec -n todolist-dev $FRONTEND_POD -- wget -O- http://localhost:80 > /dev/null || {
+            echo "Health check failed!"
+            exit 1
+          }
+
+          echo "Health check passed!"
+
+      - name: Deployment Summary
+        if: success()
+        run: |
+          echo "=== Deployment Successful ==="
+          echo "Namespace: todolist-dev"
+          echo "Frontend Image: ttambunan01/todolist-frontend:git-${GITHUB_SHA:0:7}"
+          echo ""
+          echo "=== Pods Status ==="
+          kubectl get pods -n todolist-dev
+          echo ""
+          echo "=== Services ==="
+          kubectl get svc -n todolist-dev
+          echo ""
+          echo "=== Access Frontend ==="
+          echo "Run: kubectl port-forward -n todolist-dev svc/frontend-service 3000:80"
+          echo "Then visit: http://localhost:3000"
+
+      - name: Rollback on Failure
+        if: failure()
+        run: |
+          echo "Deployment failed! Rolling back..."
+          kubectl rollout undo deployment/frontend -n todolist-dev
+          kubectl rollout status deployment/frontend -n todolist-dev --timeout=180s
