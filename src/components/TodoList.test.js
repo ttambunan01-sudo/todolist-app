@@ -46,8 +46,8 @@ describe('TodoList Component', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Test Todo 1')).toBeInTheDocument();
-      expect(screen.getByText('Test Todo 2')).toBeInTheDocument();
     });
+    expect(screen.getByText('Test Todo 2')).toBeInTheDocument();
   });
 
   test('displays error message when fetch fails', async () => {
@@ -174,9 +174,9 @@ describe('TodoList Component', () => {
 
     await waitFor(() => {
       expect(screen.getByDisplayValue('Test Todo 1')).toBeInTheDocument();
-      expect(screen.getByText('Save')).toBeInTheDocument();
-      expect(screen.getByText('Cancel')).toBeInTheDocument();
     });
+    expect(screen.getByText('Save')).toBeInTheDocument();
+    expect(screen.getByText('Cancel')).toBeInTheDocument();
   });
 
   test('saves edited todo', async () => {
@@ -222,8 +222,8 @@ describe('TodoList Component', () => {
 
     await waitFor(() => {
       expect(screen.queryByText('Save')).not.toBeInTheDocument();
-      expect(screen.queryByText('Cancel')).not.toBeInTheDocument();
     });
+    expect(screen.queryByText('Cancel')).not.toBeInTheDocument();
   });
 
   test('displays todo statistics', async () => {
@@ -232,9 +232,9 @@ describe('TodoList Component', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Total: 2/)).toBeInTheDocument();
-      expect(screen.getByText(/Completed: 1/)).toBeInTheDocument();
-      expect(screen.getByText(/Active: 1/)).toBeInTheDocument();
     });
+    expect(screen.getByText(/Completed: 1/)).toBeInTheDocument();
+    expect(screen.getByText(/Active: 1/)).toBeInTheDocument();
   });
 
   test('closes error message', async () => {

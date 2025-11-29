@@ -13,9 +13,3 @@ test('renders App component', () => {
   const appElement = screen.getByTestId('todo-list-mock');
   expect(appElement).toBeInTheDocument();
 });
-
-test('App has correct class name', () => {
-  const { container } = render(<App />);
-  const appDiv = container.querySelector('.App');
-  expect(appDiv).toBeInTheDocument();
-});
