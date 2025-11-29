@@ -44,9 +44,53 @@ jobs:
           name: build-output
           path: build/
 
-  docker-build-push:
+  lighthouse-ci:
     runs-on: ubuntu-latest
     needs: build-and-test
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          REACT_APP_API_BASE_URL: http://backend-service:8080/api/v1
+
+      - name: Run ESLint
+        run: npx eslint src/ --ext .js,.jsx --max-warnings 0
+
+      - name: Check bundle size
+        run: npx size-limit
+
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli@0.13.x
+
+      - name: Run Lighthouse CI
+        env:
+          LHCI_BUILD_TOKEN: ${{ secrets.LHCI_BUILD_TOKEN }}
+        run: lhci autorun --upload.token="${LHCI_BUILD_TOKEN}"
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/
+
+  docker-build-push:
+    runs-on: ubuntu-latest
+    needs: [build-and-test, lighthouse-ci]
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/develop')
 
     steps:
