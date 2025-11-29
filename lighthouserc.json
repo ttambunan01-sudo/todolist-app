@@ -16,9 +16,7 @@
       }
     },
     "upload": {
-      "target": "lhci",
-      "serverBaseUrl": "http://lhci-server-service.lighthouse-ci.svc.cluster.local:9001",
-      "token": ""
+      "target": "temporary-public-storage"
     },
     "assert": {
       "preset": "lighthouse:recommended",
@@ -44,7 +42,14 @@
         "modern-image-formats": "warn",
         "uses-optimized-images": "warn",
         "uses-text-compression": "error",
-        "uses-long-cache-ttl": "warn"
+        "uses-long-cache-ttl": "warn",
+
+        "color-contrast": "warn",
+        "csp-xss": "warn",
+        "errors-in-console": "warn",
+        "landmark-one-main": "warn",
+        "maskable-icon": "off",
+        "total-byte-weight": ["warn", {"maxNumericValue": 1000000}]
       }
     }
   }
