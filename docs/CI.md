@@ -34,6 +34,21 @@ The TodoList Frontend uses GitHub Actions for continuous integration and deploym
            │
            v Yes
    ┌────────────────┐
+   │ lighthouse-ci  │ (PRs & main branch)
+   ├────────────────┤
+   │ • ESLint Check │
+   │ • Bundle Size  │
+   │ • Performance  │
+   │ • Accessibility│
+   │ • Best Practices│
+   └───────┬────────┘
+           │
+  [Quality Gates?]
+           │
+           ├─ Fail ──> ❌ Pipeline Fails
+           │
+           v Pass
+   ┌────────────────┐
    │docker-build-   │ (main branch only)
    │    push        │
    ├────────────────┤
@@ -89,14 +104,50 @@ The CI pipeline runs on:
 
 **Duration:** ~2-3 minutes
 
-### Job 2: docker-build-push
+### Job 2: lighthouse-ci
+
+**Purpose:** Check code quality, bundle size, and performance metrics
+
+**Conditions:**
+- Runs on pull requests and pushes to `main` branch
+- Requires `build-and-test` job to succeed
+
+**Steps:**
+
+1. **Checkout code**
+2. **Setup Node.js 20** - With npm caching
+3. **Install dependencies** - `npm ci`
+4. **Build application** - Production build
+5. **Run ESLint** - Code linting with zero warnings threshold
+6. **Check bundle size** - Enforce JS (500KB) and CSS (100KB) limits
+7. **Install Lighthouse CI** - Global LHCI CLI installation
+8. **Run Lighthouse CI** - Performance, accessibility, and best practices audits
+9. **Upload Lighthouse reports** - Upload HTML/JSON reports as artifacts
+
+**Quality Checks:**
+- **ESLint:** Zero warnings policy
+- **Bundle Size:** JS ≤ 500KB, CSS ≤ 100KB
+- **Performance:** ≥ 90% score
+- **Accessibility:** ≥ 90% score
+- **Best Practices:** ≥ 90% score
+- **SEO:** ≥ 90% score
+- **Core Web Vitals:** LCP ≤ 2500ms, FCP ≤ 2000ms, CLS ≤ 0.1
+
+**Artifacts Created:**
+- `lighthouse-reports` - Lighthouse HTML/JSON reports
+
+**Duration:** ~3-5 minutes
+
+See [QUALITY_GATES.md](QUALITY_GATES.md) for detailed quality gates documentation.
+
+### Job 3: docker-build-push
 
 **Purpose:** Build and publish Docker image to Docker Hub
 
 **Conditions:**
 - Only runs on `push` events
 - Only runs on `main` branch
-- Requires `build-and-test` job to succeed
+- Requires both `build-and-test` and `lighthouse-ci` jobs to succeed
 
 **Steps:**
 
@@ -120,6 +171,7 @@ Configure these in GitHub repository settings:
 |------------|-------------|---------|
 | `DOCKERHUB_USERNAME` | Docker Hub username | `ttambunan01` |
 | `DOCKERHUB_TOKEN` | Docker Hub access token | `dckr_pat_xxxxx...` |
+| `LHCI_BUILD_TOKEN` | Lighthouse CI build token (optional) | `xxxxx-xxxxx-xxxxx...` |
 
 **To add secrets:**
 1. Go to `https://github.com/ttambunan01-sudo/todolist-app/settings/secrets/actions`
@@ -355,15 +407,17 @@ Current coverage targets:
    - Visual regression testing
    - Cross-browser testing
 
-2. **Performance Testing**
-   - Lighthouse CI integration
-   - Bundle size tracking
-   - Performance budgets
+2. **Performance Testing** ✅ IMPLEMENTED
+   - ✅ Lighthouse CI integration (see [QUALITY_GATES.md](QUALITY_GATES.md))
+   - ✅ Bundle size tracking (size-limit)
+   - ✅ Performance budgets (Lighthouse assertions)
+   - ✅ Core Web Vitals monitoring
 
-3. **Quality Gates**
-   - ESLint in CI pipeline
-   - Code smell detection
-   - Accessibility testing (a11y)
+3. **Quality Gates** ✅ IMPLEMENTED
+   - ✅ ESLint in CI pipeline (zero warnings)
+   - ✅ Accessibility testing (Lighthouse ≥ 90%)
+   - ✅ Best practices enforcement
+   - ✅ SEO validation
 
 4. **Security**
    - npm audit in pipeline
@@ -378,7 +432,9 @@ Current coverage targets:
 ## Related Documentation
 
 - [README.md](../README.md) - Project overview and quick start
+- [QUALITY_GATES.md](QUALITY_GATES.md) - Comprehensive quality gates documentation
 - [Backend CI/CD](https://github.com/ttambunan01-sudo/todolist/blob/main/docs/CI.md) - Backend pipeline docs
+- [Lighthouse CI Dashboard](http://localhost:9001) - Performance trends (via port-forward)
 
 ## Support
 
