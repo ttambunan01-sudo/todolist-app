@@ -1,12 +1,10 @@
 [
   {
     "path": "build/static/js/*.js",
-    "limit": "500 KB",
-    "webpack": false
+    "limit": "500 KB"
   },
   {
     "path": "build/static/css/*.css",
-    "limit": "100 KB",
-    "webpack": false
+    "limit": "100 KB"
   }
 ]
