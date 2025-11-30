@@ -113,7 +113,7 @@ jobs:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/todolist-frontend
           tags: |
             type=raw,value=latest
-            type=sha,prefix=git-
+            type=sha,prefix=git-,format=long
 
       - name: Build and push
         id: docker_build
